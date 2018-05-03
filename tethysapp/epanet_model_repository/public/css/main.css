@@ -5,3 +5,41 @@
 #app-header .tethys-app-header .icon-wrapper img {
     border-radius: 0 !important;
 }
+
+
+/*****************************************************/
+
+/*****************************************************/
+/*                  MODEL REP MODAL                  */
+
+#model-rep {
+    width: auto;
+    margin: 40px;
+}
+#model-rep tbody tr:hover {
+    background-color: #0099ff;
+    color: white;
+    cursor: pointer;
+}
+#model-rep {
+    bottom: 110px;
+    right: 1px;
+    left: inherit;
+}
+#div-chkbx-model-auto-close {
+    position: fixed;
+    bottom: 65px;
+    margin: 10px 0 5px 0;
+    height: 30px;
+}
+#chkbx-model-auto-close {
+    margin-left: 25px;
+}
+
+input[type="radio"] {
+    cursor: pointer;
+}
+
+#model-rep td, #model-rep th {
+    padding: 10px;
+}

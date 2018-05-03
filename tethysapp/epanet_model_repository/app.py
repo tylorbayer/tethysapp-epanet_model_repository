@@ -21,14 +21,18 @@ class EpanetModelRepository(TethysAppBase):
         """
         Add controllers
         """
-        UrlMap = url_map_maker(self.root_url)
+        url_map = url_map_maker(self.root_url)
 
         url_maps = (
-            UrlMap(
-                name='home',
-                url='epanet-model-repository',
-                controller='epanet_model_repository.controllers.home'
-            ),
+            url_map(name='home',
+                    url='epanet-model-repository',
+                    controller='epanet_model_repository.controllers.home'),
+            url_map(name='get_epanet_model_list',
+                    url='epanet-model-repository/get-epanet-model-list',
+                    controller='epanet_model_repository.ajax_controllers.get_epanet_model_list'),
+            url_map(name='get_epanet_model',
+                    url='epanet-model-repository/get-epanet-model',
+                    controller='epanet_model_repository.ajax_controllers.get_epanet_model')
         )
 
         return url_maps
