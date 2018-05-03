@@ -1,0 +1,7 @@
+/*****************************************************/
+
+/*****************************************************/
+/*              OVERRIDE TETHYS DEFAULT              */
+#app-header .tethys-app-header .icon-wrapper img {
+    border-radius: 0 !important;
+}
