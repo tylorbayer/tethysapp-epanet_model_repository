@@ -39,7 +39,9 @@
         $modelRep.find('tbody tr').on('click', function () {
             $(this).unbind()
                 .dblclick(function () {
-                    console.log("model clicked!!");
+                    var $rdoRes = $('.rdo-model:checked');
+                    var modelId = $rdoRes.val();
+                    window.open("http://localhost:8000/apps/epanet-model-viewer/?modelID=" + modelId,"_self")
                 })
                 .css({
                     'background-color': '#1abc9c',
