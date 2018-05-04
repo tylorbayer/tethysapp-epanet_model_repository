@@ -17,7 +17,7 @@
     margin: 40px;
 }
 #model-rep tbody tr:hover {
-    background-color: #0099ff;
+    background-color: #006699;
     color: white;
     cursor: pointer;
 }

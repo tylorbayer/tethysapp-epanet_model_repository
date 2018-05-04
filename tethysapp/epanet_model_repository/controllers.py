@@ -8,6 +8,6 @@ def home(request):
     Controller for the app home page.
     """
 
-    context = {}
+    context = {'modelType': request.GET.get('modelType', '')}
 
     return render(request, 'epanet_model_repository/home.html', context)
