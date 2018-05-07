@@ -16,12 +16,17 @@
     /************************************************************************
      *                      MODULE LEVEL / GLOBAL VARIABLES
      *************************************************************************/
-    var dataTableLoadModels;
+    var dataTableLoadModels,
+        ownerFilters,
+        subjectFilters;
 
     //  *********FUNCTIONS***********
     var addListenersToModelRepTable,
+        addListenersToFilters,
+        refreshFilters,
         addInitialEventListeners,
         buildModelRepTable,
+        populateFilter,
         generateModelList,
         initializeJqueryVariables,
         addDefaultBehaviorToAjax,
@@ -29,7 +34,9 @@
         getCookie;
 
     //  **********Query Selectors************
-    var $modelRep;
+    var $modelRep,
+        $ownerFilters,
+        $subjectFilters;
 
     /******************************************************
      **************FUNCTION DECLARATIONS*******************
@@ -41,7 +48,8 @@
                 .dblclick(function () {
                     var $rdoRes = $('.rdo-model:checked');
                     var modelId = $rdoRes.val();
-                    window.open("http://localhost:8000/apps/epanet-model-viewer/?modelID=" + modelId,"_self")
+                    var curURL = window.location.href;
+                    window.open(curURL.substring(0, curURL.indexOf('/apps/') + 6) + "epanet-model-viewer/?modelID=" + modelId,"_self");
                 })
                 .css({
                     'background-color': '#1abc9c',
@@ -52,6 +60,70 @@
                 'background-color': '',
                 'color': ''
             });
+        });
+    };
+
+    addListenersToFilters = function () {
+        $ownerFilters.find('li').on('click', function () {
+            refreshFilters();
+            dataTableLoadModels.draw();
+        });
+
+        $subjectFilters.find('li').on('click', function () {
+            refreshFilters();
+            dataTableLoadModels.draw();
+        });
+    };
+
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        var owner = data[4];
+        var subjects = data[2].split(', ');
+
+        if (typeof ownerFilters == 'undefined' || typeof subjectFilters == 'undefined' ||
+            (subjectFilters.length == 0 && ownerFilters.length == 0))
+            return true;
+        else {
+            if (subjectFilters.length == 0)
+                return (ownerFilters.indexOf(owner) > -1);
+            else if (ownerFilters.length == 0) {
+                var add = false;
+
+                for (var i in subjects) {
+                    if (subjectFilters.indexOf(subjects[i]) > -1)
+                        add = true;
+                }
+
+                return add;
+            }
+            else {
+                if (ownerFilters.indexOf(owner) > -1) {
+                    var add = false;
+
+                    for (var i in subjects) {
+                        if (subjectFilters.indexOf(subjects[i]) > -1)
+                            add = true;
+                    }
+
+                    return add;
+                }
+                else
+                    return false;
+            }
+        }
+    });
+
+    refreshFilters = function () {
+        ownerFilters = [];
+        subjectFilters = [];
+
+        $ownerFilters.find('input').each(function () {
+            if ($(this).is(":checked"))
+                ownerFilters.push($(this).val());
+        });
+
+        $subjectFilters.find('input').each(function () {
+            if ($(this).is(":checked"))
+                subjectFilters.push($(this).val());
         });
     };
 
@@ -87,26 +159,36 @@
     };
 
     buildModelRepTable = function (modelList) {
+        var owners = {};
+        var subjects = {};
+
         var modelTableHtml;
 
         modelList = typeof modelList === 'string' ? JSON.parse(modelList) : modelList;
         modelTableHtml = '<table id="tbl-models"><thead><th></th><th>Title</th><th>Subjects</th><th>Type</th><th>Owner</th></thead><tbody>';
 
         modelList.forEach(function (model) {
-            var subjects = "";
+            if (model.owner in owners)
+                owners[model.owner] += 1;
+            else
+                owners[model.owner] = 1;
 
-            for (var subject in model.subjects) {
-                subjects += subject + " ";
-            }
+            model.subjects.forEach(function (subject) {
+                if (subject in subjects)
+                    subjects[subject] += 1;
+                else
+                    subjects[subject] = 1;
+            });
 
             modelTableHtml += '<tr>' +
                 '<td><input type="radio" name="model" class="rdo-model" value="' + model.id + '"></td>' +
                 '<td class="model_title">' + model.title + '</td>' +
-                '<td class="model_subjects">' + model.subjects + '</td>' +
+                '<td class="model_subjects">' + model.subjects.join(', ') + '</td>' +
                 '<td class="model_type">' + model.type + '</td>' +
                 '<td class="model_owner">' + model.owner + '</td>' +
                 '</tr>';
         });
+
         modelTableHtml += '</tbody></table>';
         $modelRep.html(modelTableHtml);
         addListenersToModelRepTable();
@@ -123,7 +205,36 @@
                 footer: true
             }
         });
+
+        populateFilter($ownerFilters, "owner", owners);
+        populateFilter($subjectFilters, "subject", subjects);
+        addListenersToFilters();
     };
+
+    populateFilter = function (filterContainer, filterType, filterList) {
+        var filterHTML;
+        var identifier;
+
+        for (var filter in filterList) {
+            identifier = filterType + "-" + filter;
+
+            filterHTML = '<li class="list-group-item" rel="' + filterType + ',' + filter + '"><span class="badge">' + filterList[filter] +
+                '</span><label class="checkbox noselect"><input type="checkbox" id="' + identifier + '" value="' + filter + '">' +
+                filter + '</label></li>';
+
+            filterContainer.append(filterHTML);
+        }
+    };
+
+    initializeJqueryVariables = function () {
+        $modelRep = $('#model-rep');
+        $ownerFilters = $('#list-group-owner');
+        $subjectFilters = $('#list-group-subject');
+    };
+
+    /*-----------------------------------------------
+     ********CORRECT POST REQUEST FUNCTIONS**********
+     ----------------------------------------------*/
 
     addDefaultBehaviorToAjax = function () {
         // Add CSRF token to appropriate ajax requests
@@ -160,10 +271,6 @@
             }
         }
         return cookieValue;
-    };
-
-    initializeJqueryVariables = function () {
-        $modelRep = $('#model-rep');
     };
 
     /*-----------------------------------------------

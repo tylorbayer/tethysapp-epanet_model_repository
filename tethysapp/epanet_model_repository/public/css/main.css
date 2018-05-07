@@ -43,3 +43,95 @@ input[type="radio"] {
 #model-rep td, #model-rep th {
     padding: 10px;
 }
+
+/*****************************************************/
+
+/*****************************************************/
+/*                      General                      */
+
+.page-title {
+    margin: 30px 0;
+    margin-top: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #DDD;
+}
+
+.panel {
+    border-radius: 0;
+}
+
+.filter-list .list-group-item {
+    border: 0;
+    border-radius: 0;
+    padding: 0 10px;
+    text-align: left;
+}
+
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.list-group-item:hover {
+    background-color: lightgray;
+}
+
+.filter-list .list-group-item {
+    border: 0;
+    border-radius: 0;
+    padding: 0 10px;
+    padding-top: 0px;
+    padding-right: 10px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    text-align: left;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.filter-list .list-group {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.filter-list .badge {
+    margin-top: 5px;
+}
+
+.list-group {
+    margin: 0;
+}
+
+.filter-list label.checkbox {
+    font-weight: normal;
+    border-radius: 0;
+    cursor: pointer;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 32px;
+    padding-left: 20px;
+    margin: 0;
+}
+
+h4.panel-title {
+    color: #696969;
+    text-shadow: 0 1px 0 #fff;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 16px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Lato', sans-serif;
+}
