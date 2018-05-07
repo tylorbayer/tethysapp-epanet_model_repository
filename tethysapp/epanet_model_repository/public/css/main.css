@@ -45,7 +45,7 @@ input[type="radio"] {
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
-    border: 1px solid #0000002e;
+    border: 1px solid #00000030;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
