@@ -16,7 +16,7 @@ def get_epanet_model_list(request):
     return_obj = {
         'success': False,
         'message': None,
-        'model_list': None
+        'model_list': None,
     }
 
     if request.is_ajax() and request.method == 'GET':
@@ -29,15 +29,20 @@ def get_epanet_model_list(request):
 
         try:
             for model in hs.resources(type="ModelInstanceResource"):
+                add_model = False
 
                 science_metadata_json = hs.getScienceMetadata(model['resource_id'])
 
-                if not science_metadata_json['executed_by'] is None:
-                    if science_metadata_json['executed_by']['modelProgramName'] == 'EPANET_2.0':
-                        subjects = []
-                        for subject in science_metadata_json['subjects']:
-                            subjects.append(" " + subject['value'])
+                if not science_metadata_json['subjects'] is None:
+                    subjects = []
+                    for subject in science_metadata_json['subjects']:
+                        if subject['value'] == 'EPANET_2.0':
+                            add_model = True
+                            continue
 
+                        subjects.append(subject['value'])
+
+                    if add_model:
                         model_list.append({
                             'title': model['resource_title'],
                             'id': model['resource_id'],
