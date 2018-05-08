@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-import requests
+import requests, os, tempfile
 
 from hs_restclient import HydroShare
 from tethys_services.backends.hs_restclient_helper import get_oauth_hs
@@ -89,6 +89,53 @@ def get_epanet_model(request):
                 model = requests.get(model_file["url"])
                 return_obj['results'] = model.text
                 return_obj['success'] = True
+
+    else:
+        return_obj['message'] = message_template_wrong_req_method.format(method="GET")
+
+    return JsonResponse(return_obj)
+
+
+def upload_epanet_model(request):
+    return_obj = {
+        'success': False,
+        'message': None,
+        'results': "",
+    }
+
+    if request.is_ajax() and request.method == 'POST':
+        try:
+            hs = get_oauth_hs(request)
+        except:
+            hs = HydroShare()
+
+        model_title = request.POST['model_title']
+        resource_filename = model_title + ".inp"
+
+        abstract = request.POST['model_description']
+        title = model_title
+
+        user_keywords = ["EPANET_2.0"]
+        for keyword in request.POST['model_keywords'].split(","):
+            user_keywords.append(keyword)
+        keywords = (tuple(user_keywords))
+
+        rtype = 'ModelInstanceResource'
+        extra_metadata = '{"modelProgram": "EPANET_2.0"}'
+
+        fd, path = tempfile.mkstemp()
+        with os.fdopen(fd, 'w') as tmp:
+            tmp.write(request.POST['model_file'])
+            fpath = path
+
+        metadata = '[{"creator":{"name":"' + hs.getUserInfo()['first_name'] + ' ' + hs.getUserInfo()['last_name'] + '"}}]'
+
+        resource_id = hs.createResource(rtype, title, resource_file=fpath, resource_filename=resource_filename, keywords=keywords, abstract=abstract, metadata=metadata, extra_metadata=extra_metadata)
+
+        hs.setAccessRules(resource_id, public=True)
+
+        return_obj['results'] = resource_id
+        return_obj['success'] = True
 
     else:
         return_obj['message'] = message_template_wrong_req_method.format(method="GET")

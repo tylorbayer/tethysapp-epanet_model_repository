@@ -18,7 +18,8 @@
      *************************************************************************/
     var dataTableLoadModels,
         ownerFilters,
-        subjectFilters;
+        subjectFilters,
+        showLog;
 
     //  *********FUNCTIONS***********
     var addListenersToModelRepTable,
@@ -28,28 +29,71 @@
         buildModelRepTable,
         populateFilter,
         generateModelList,
+        onClickOpenModel,
+        uploadModel,
+        resetUploadState,
         initializeJqueryVariables,
         addDefaultBehaviorToAjax,
         checkCsrfSafe,
-        getCookie;
+        getCookie,
+        addLogEntry;
 
     //  **********Query Selectors************
     var $modelRep,
         $ownerFilters,
-        $subjectFilters;
+        $subjectFilters,
+        $loadFromLocal,
+        $btnUl,
+        $btnUlCancel,
+        $inpUlTitle,
+        $inpUlDescription,
+        $inpUlKeywords,
+        $btnOpenModel;
 
     /******************************************************
      **************FUNCTION DECLARATIONS*******************
      ******************************************************/
 
+    addInitialEventListeners = function () {
+        $btnOpenModel.click(function () {
+            onClickOpenModel();
+        });
+
+        $btnUl.click(function() {
+            if ($loadFromLocal.val() != '' && $inpUlTitle.val() != '' && $inpUlDescription.val() != '' && $inpUlKeywords.val() != '') {
+                var data = new FormData();
+                data.append('model_title', $inpUlTitle.val());
+                data.append('model_description', $inpUlDescription.val());
+                data.append('model_keywords', $inpUlKeywords.tagsinput('items'));
+
+                var file = $loadFromLocal[0].files[0];
+                var reader = new FileReader();
+                reader.onload = function() {
+                    data.append('model_file', reader.result);
+                    uploadModel(data);
+                };
+                reader.readAsText(file);
+
+                $('#modal-upload').modal('hide');
+                resetUploadState();
+            }
+            else {
+                alert("Fields not entered correctly. Cannot upload model to Hydroshare. Fill the correct fields in and try again.");
+            }
+        });
+
+        $btnUlCancel.click(function() {
+            resetUploadState();
+        });
+    };
+
     addListenersToModelRepTable = function () {
         $modelRep.find('tbody tr').on('click', function () {
+            $btnOpenModel.prop('disabled', false);
+
             $(this).unbind()
                 .dblclick(function () {
-                    var $rdoRes = $('.rdo-model:checked');
-                    var modelId = $rdoRes.val();
-                    var curURL = window.location.href;
-                    window.open(curURL.substring(0, curURL.indexOf('/apps/') + 6) + "epanet-model-viewer/?modelID=" + modelId,"_self");
+                    onClickOpenModel();
                 })
                 .css({
                     'background-color': '#1abc9c',
@@ -73,6 +117,13 @@
             refreshFilters();
             dataTableLoadModels.draw();
         });
+    };
+
+    onClickOpenModel = function () {
+        var $rdoRes = $('.rdo-model:checked');
+        var modelId = $rdoRes.val();
+        var curURL = window.location.href;
+        window.open(curURL.substring(0, curURL.indexOf('/apps/') + 6) + "epanet-model-viewer/?modelID=" + modelId,"_self");
     };
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
@@ -127,10 +178,6 @@
         });
     };
 
-    addInitialEventListeners = function () {
-
-    };
-
     generateModelList = function (numRequests) {
         $.ajax({
             type: 'GET',
@@ -152,6 +199,7 @@
                         if (response.hasOwnProperty('model_list')) {
                             buildModelRepTable(response.model_list);
                         }
+                        $btnOpenModel.add('#div-chkbx-model-auto-close').removeClass('hidden');
                     }
                 }
             }
@@ -226,10 +274,96 @@
         }
     };
 
+    uploadModel = function (data) {
+        $.ajax({
+            type: 'POST',
+            url: '/apps/epanet-model-repository/upload-epanet-model/',
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            data: data,
+            error: function () {
+                var message = 'An unexpected error occurred while uploading the model ';
+
+                addLogEntry('danger', message);
+            },
+            success: function (response) {
+                var message;
+
+                if (response.hasOwnProperty('success')) {
+                    if (response.hasOwnProperty('message')) {
+                        message = response.message;
+                    }
+
+                    if (!response.success) {
+                        if (!message) {
+                            message = 'An unexpected error occurred while uploading the model';
+                        }
+
+                        addLogEntry('danger', message);
+                    } else {
+                        if (message) {
+                            addLogEntry('warning', message);
+                        }
+                        $modelRep.html('<img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
+                                '<br><p><b>Loading model repository...</b></p><p>Note: Loading will continue if dialog is closed.</p>');
+                        alert("Model has successfully been uploaded to HydroShare.");
+                        generateModelList();
+                    }
+                }
+            }
+        });
+    };
+
+    resetUploadState = function() {
+        $loadFromLocal.val('');
+        $inpUlTitle.val('');
+        $inpUlDescription.val('');
+        $inpUlKeywords.tagsinput('removeAll');
+    };
+
+    addLogEntry = function (type, message, show) {
+        var icon;
+        var timeStamp;
+
+        switch (type) {
+            case 'success':
+                icon = 'ok';
+                break;
+            case 'danger':
+                icon = 'remove';
+                showLog = true;
+                break;
+            default:
+                icon = type;
+                showLog = true;
+        }
+
+        timeStamp = new Date().toISOString();
+
+        $('#logEntries').prepend('<div class="alert-' + type + '">' +
+            '<span class="glyphicon glyphicon-' + icon + '-sign" aria-hidden="true"></span>  '
+            + timeStamp + ' *** \t'
+            + message +
+            '</div><br>');
+
+        if (show) {
+            $modalLog.modal('show');
+            showLog = false;
+        }
+    };
+
     initializeJqueryVariables = function () {
         $modelRep = $('#model-rep');
         $ownerFilters = $('#list-group-owner');
         $subjectFilters = $('#list-group-subject');
+        $btnUl = $('#btn-upload');
+        $btnUlCancel = $('#btn-upload-cancel');
+        $loadFromLocal = $("#load-from-local");
+        $inpUlTitle = $('#inp-upload-title');
+        $inpUlDescription = $('#inp-upload-description');
+        $inpUlKeywords = $('#tagsinp-upload-keywords');
+        $btnOpenModel = $('#btn-open-model')
     };
 
     /*-----------------------------------------------
@@ -272,6 +406,8 @@
         }
         return cookieValue;
     };
+
+    showLog = false;
 
     /*-----------------------------------------------
      **************ONLOAD FUNCTION*******************
