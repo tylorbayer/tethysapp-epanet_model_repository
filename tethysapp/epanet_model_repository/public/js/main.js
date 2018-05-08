@@ -19,6 +19,7 @@
     var dataTableLoadModels,
         ownerFilters,
         subjectFilters,
+        availabilityFilters,
         showLog;
 
     //  *********FUNCTIONS***********
@@ -42,6 +43,7 @@
     var $modelRep,
         $ownerFilters,
         $subjectFilters,
+        $availabilityFilters,
         $loadFromLocal,
         $btnUl,
         $btnUlCancel,
@@ -105,6 +107,8 @@
                 'color': ''
             });
         });
+
+        $('[data-toggle="tooltip"]').tooltip();
     };
 
     addListenersToFilters = function () {
@@ -117,6 +121,32 @@
             refreshFilters();
             dataTableLoadModels.draw();
         });
+
+        $availabilityFilters.find('li').on('click', function () {
+            refreshFilters();
+            dataTableLoadModels.draw();
+        });
+
+        $('#owner').on('shown.bs.collapse', function() {
+            $("#icon-owner").addClass('glyphicon-minus').removeClass('glyphicon-plus');
+        });
+        $('#owner').on('hidden.bs.collapse', function() {
+            $("#icon-owner").addClass('glyphicon-plus').removeClass('glyphicon-minus');
+        });
+
+        $('#subject').on('shown.bs.collapse', function() {
+            $("#icon-suject").addClass('glyphicon-minus').removeClass('glyphicon-plus');
+        });
+        $('#subject').on('hidden.bs.collapse', function() {
+            $("#icon-suject").addClass('glyphicon-plus').removeClass('glyphicon-minus');
+        });
+
+        $('#availability').on('shown.bs.collapse', function() {
+            $("#icon-availability").addClass('glyphicon-minus').removeClass('glyphicon-plus');
+        });
+        $('#availability').on('hidden.bs.collapse', function() {
+            $("#icon-availability").addClass('glyphicon-plus').removeClass('glyphicon-minus');
+        });
     };
 
     onClickOpenModel = function () {
@@ -127,45 +157,55 @@
     };
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        var ownAdd = false;
+        var subAdd  = false;
+        var avaAdd  = false;
+
         var owner = data[4];
         var subjects = data[2].split(', ');
+        var availability = data[3];
 
-        if (typeof ownerFilters == 'undefined' || typeof subjectFilters == 'undefined' ||
-            (subjectFilters.length == 0 && ownerFilters.length == 0))
+        if (typeof ownerFilters == 'undefined' || typeof subjectFilters == 'undefined' || typeof subjectFilters == 'undefined' ||
+            (subjectFilters.length == 0 && ownerFilters.length == 0 && availabilityFilters.length == 0))
             return true;
         else {
-            if (subjectFilters.length == 0)
-                return (ownerFilters.indexOf(owner) > -1);
-            else if (ownerFilters.length == 0) {
-                var add = false;
+            if (ownerFilters.length > 0)
+                ownAdd = (ownerFilters.indexOf(owner) > -1);
+            else
+                ownAdd = true;
 
+            if (subjectFilters.length > 0) {
                 for (var i in subjects) {
-                    if (subjectFilters.indexOf(subjects[i]) > -1)
-                        add = true;
-                }
-
-                return add;
-            }
-            else {
-                if (ownerFilters.indexOf(owner) > -1) {
-                    var add = false;
-
-                    for (var i in subjects) {
-                        if (subjectFilters.indexOf(subjects[i]) > -1)
-                            add = true;
+                    if (subjectFilters.indexOf(subjects[i]) > -1) {
+                        console.log(subjectFilters);
+                        console.log(subjects[i]);
+                        subAdd = true;
                     }
-
-                    return add;
                 }
-                else
-                    return false;
             }
+            else
+                subAdd = true;
+
+            if (availabilityFilters.length > 0) {
+                console.log(availability);
+                for (var i in availabilityFilters) {
+                    console.log(availabilityFilters[i]);
+                    if (availability.indexOf(availabilityFilters[i]) > -1) {
+                        avaAdd = true;
+                    }
+                }
+            }
+            else
+                avaAdd = true;
+
+            return (ownAdd && subAdd && avaAdd);
         }
     });
 
     refreshFilters = function () {
         ownerFilters = [];
         subjectFilters = [];
+        availabilityFilters =[];
 
         $ownerFilters.find('input').each(function () {
             if ($(this).is(":checked"))
@@ -175,6 +215,11 @@
         $subjectFilters.find('input').each(function () {
             if ($(this).is(":checked"))
                 subjectFilters.push($(this).val());
+        });
+
+        $availabilityFilters.find('input').each(function () {
+            if ($(this).is(":checked"))
+                availabilityFilters.push($(this).val());
         });
     };
 
@@ -213,7 +258,7 @@
         var modelTableHtml;
 
         modelList = typeof modelList === 'string' ? JSON.parse(modelList) : modelList;
-        modelTableHtml = '<table id="tbl-models"><thead><th></th><th>Title</th><th>Subjects</th><th>Type</th><th>Owner</th></thead><tbody>';
+        modelTableHtml = '<table id="tbl-models"><thead><th></th><th>Title</th><th>Subjects</th><th> Info</th><th>Owner</th></thead><tbody>';
 
         modelList.forEach(function (model) {
             if (model.owner in owners)
@@ -231,8 +276,23 @@
             modelTableHtml += '<tr>' +
                 '<td><input type="radio" name="model" class="rdo-model" value="' + model.id + '"></td>' +
                 '<td class="model_title">' + model.title + '</td>' +
-                '<td class="model_subjects">' + model.subjects.join(', ') + '</td>' +
-                '<td class="model_type">' + model.type + '</td>' +
+                '<td class="model_subjects">' + model.subjects.join(', ') + '</td>';
+
+            var modelInfoHtml = "";
+
+            if (model.public == true)
+                modelInfoHtml += 'p<img src="/static/epanet_model_repository/images/public.png" data-toggle="tooltip" data-placement="right" title="Public">';
+            else
+                if (model.discoverable == true)
+                    modelInfoHtml += 'd<img src="/static/epanet_model_repository/images/discoverable.png" data-toggle="tooltip" data-placement="right" title="Discoverable">';
+                else
+                    modelInfoHtml += 'r<img src="/static/epanet_model_repository/images/private.png" data-toggle="tooltip" data-placement="right" title="Private">';
+            if (model.shareable == true)
+                modelInfoHtml += 's<img src="/static/epanet_model_repository/images/shareable.png" data-toggle="tooltip" data-placement="right" title="Shareable">';
+            else
+                modelInfoHtml += 'n<img src="/static/epanet_model_repository/images/non-shareable.png" data-toggle="tooltip" data-placement="right" title="Not Shareable">';
+
+            modelTableHtml += '<td class="model_info">' + modelInfoHtml + '</td>' +
                 '<td class="model_owner">' + model.owner + '</td>' +
                 '</tr>';
         });
@@ -316,9 +376,7 @@
     };
 
     resetUploadState = function() {
-        $loadFromLocal.val('');
-        $inpUlTitle.val('');
-        $inpUlDescription.val('');
+        $('#frm-upload')[0].reset();
         $inpUlKeywords.tagsinput('removeAll');
     };
 
@@ -357,6 +415,7 @@
         $modelRep = $('#model-rep');
         $ownerFilters = $('#list-group-owner');
         $subjectFilters = $('#list-group-subject');
+        $availabilityFilters = $('#list-group-availability');
         $btnUl = $('#btn-upload');
         $btnUlCancel = $('#btn-upload-cancel');
         $loadFromLocal = $("#load-from-local");
