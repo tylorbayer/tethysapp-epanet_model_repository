@@ -29,6 +29,7 @@
         addInitialEventListeners,
         buildModelRepTable,
         populateFilter,
+        sortFilter,
         generateModelList,
         onClickOpenModel,
         uploadModel,
@@ -93,7 +94,7 @@
         $modelRep.find('tbody tr').on('click', function () {
             $btnOpenModel.prop('disabled', false);
 
-            $(this).unbind()
+            $(this)
                 .dblclick(function () {
                     onClickOpenModel();
                 })
@@ -177,8 +178,6 @@
             if (subjectFilters.length > 0) {
                 for (var i in subjects) {
                     if (subjectFilters.indexOf(subjects[i]) > -1) {
-                        console.log(subjectFilters);
-                        console.log(subjects[i]);
                         subAdd = true;
                     }
                 }
@@ -187,9 +186,7 @@
                 subAdd = true;
 
             if (availabilityFilters.length > 0) {
-                console.log(availability);
                 for (var i in availabilityFilters) {
-                    console.log(availabilityFilters[i]);
                     if (availability.indexOf(availabilityFilters[i]) > -1) {
                         avaAdd = true;
                     }
@@ -254,6 +251,13 @@
     buildModelRepTable = function (modelList) {
         var owners = {};
         var subjects = {};
+        var availability = {
+            public: 0,
+            discoverable: 0,
+            private: 0,
+            shareable: 0,
+            nonShareable: 0
+        };
 
         var modelTableHtml;
 
@@ -280,17 +284,27 @@
 
             var modelInfoHtml = "";
 
-            if (model.public == true)
+            if (model.public == true) {
                 modelInfoHtml += 'p<img src="/static/epanet_model_repository/images/public.png" data-toggle="tooltip" data-placement="right" title="Public">';
+                availability["public"] += 1;
+            }
             else
-                if (model.discoverable == true)
+                if (model.discoverable == true) {
                     modelInfoHtml += 'd<img src="/static/epanet_model_repository/images/discoverable.png" data-toggle="tooltip" data-placement="right" title="Discoverable">';
-                else
+                    availability["discoverable"] += 1;
+                }
+                else {
                     modelInfoHtml += 'r<img src="/static/epanet_model_repository/images/private.png" data-toggle="tooltip" data-placement="right" title="Private">';
-            if (model.shareable == true)
+                    availability["private"] += 1;
+                }
+            if (model.shareable == true) {
                 modelInfoHtml += 's<img src="/static/epanet_model_repository/images/shareable.png" data-toggle="tooltip" data-placement="right" title="Shareable">';
-            else
+                availability["shareable"] += 1;
+            }
+            else {
                 modelInfoHtml += 'n<img src="/static/epanet_model_repository/images/non-shareable.png" data-toggle="tooltip" data-placement="right" title="Not Shareable">';
+                availability["nonShareable"] += 1;
+            }
 
             modelTableHtml += '<td class="model_info">' + modelInfoHtml + '</td>' +
                 '<td class="model_owner">' + model.owner + '</td>' +
@@ -316,12 +330,25 @@
 
         populateFilter($ownerFilters, "owner", owners);
         populateFilter($subjectFilters, "subject", subjects);
+
+        $("#bdg-public").html(availability["public"]);
+        $("#bdg-discoverable").html(availability["discoverable"]);
+        $("#bdg-private").html(availability["private"]);
+        $("#bdg-shareable").html(availability["shareable"]);
+        $("#bdg-non-shareable").html(availability["nonShareable"]);
+
+        sortFilter($ownerFilters);
+        sortFilter($subjectFilters);
+        sortFilter($availabilityFilters);
+
         addListenersToFilters();
     };
 
     populateFilter = function (filterContainer, filterType, filterList) {
         var filterHTML;
         var identifier;
+
+        filterContainer.empty();
 
         for (var filter in filterList) {
             identifier = filterType + "-" + filter;
@@ -333,6 +360,13 @@
             filterContainer.append(filterHTML);
         }
     };
+
+    sortFilter = function ($filterGroup) {
+        $filterGroup.find('.list-group-item').sort(function(a, b) {
+            return $(b).find('.badge').html() - $(a).find('.badge').html();
+        })
+        .appendTo($filterGroup);
+    }
 
     uploadModel = function (data) {
         $.ajax({
