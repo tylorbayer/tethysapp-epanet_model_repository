@@ -366,7 +366,7 @@
             return $(b).find('.badge').html() - $(a).find('.badge').html();
         })
         .appendTo($filterGroup);
-    }
+    };
 
     uploadModel = function (data) {
         $.ajax({
