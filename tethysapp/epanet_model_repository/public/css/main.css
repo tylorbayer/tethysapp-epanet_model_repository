@@ -5,6 +5,7 @@
 
 #app-header .tethys-app-header .icon-wrapper img {
     border-radius: 0 !important;
+    height: 50px !important;
 }
 
 /*****************************************************/
@@ -65,6 +66,11 @@ input[type="radio"] {
     color: white !important;
     background: #428bca;
     border-color: #428bca;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: white !important;
+    background: #006699;
+    border-color: #006699;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button {
     border-radius: 0;

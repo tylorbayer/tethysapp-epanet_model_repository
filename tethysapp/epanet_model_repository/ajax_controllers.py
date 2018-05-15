@@ -28,30 +28,51 @@ def get_epanet_model_list(request):
         model_list = []
 
         try:
-            for model in hs.resources(type="ModelInstanceResource"):
-                add_model = False
-
+            # for model in hs.resources(type="ModelInstanceResource"):
+            #     add_model = False
+            #
+            #     science_metadata_json = hs.getScienceMetadata(model['resource_id'])
+            #
+            #     if not science_metadata_json['subjects'] is None:
+            #         subjects = []
+            #         for subject in science_metadata_json['subjects']:
+            #             if subject['value'] == 'EPANET_2.0':
+            #                 add_model = True
+            #                 continue
+            #
+            #             subjects.append(subject['value'])
+            #
+            #         if add_model:
+            #             model_list.append({
+            #                 'title': model['resource_title'],
+            #                 'id': model['resource_id'],
+            #                 'owner': model['creator'],
+            #                 'public': model['public'],
+            #                 'shareable': model['shareable'],
+            #                 'discoverable': model['discoverable'],
+            #                 'subjects': subjects
+            #             })
+            for model in hs.resources(full_text_search="{%EPANET Model Repository%}"):
                 science_metadata_json = hs.getScienceMetadata(model['resource_id'])
 
+                subjects = []
+
                 if not science_metadata_json['subjects'] is None:
-                    subjects = []
                     for subject in science_metadata_json['subjects']:
                         if subject['value'] == 'EPANET_2.0':
-                            add_model = True
                             continue
 
                         subjects.append(subject['value'])
 
-                    if add_model:
-                        model_list.append({
-                            'title': model['resource_title'],
-                            'id': model['resource_id'],
-                            'owner': model['creator'],
-                            'public': model['public'],
-                            'shareable': model['shareable'],
-                            'discoverable': model['discoverable'],
-                            'subjects': subjects
-                        })
+                model_list.append({
+                    'title': model['resource_title'],
+                    'id': model['resource_id'],
+                    'owner': model['creator'],
+                    'public': model['public'],
+                    'shareable': model['shareable'],
+                    'discoverable': model['discoverable'],
+                    'subjects': subjects
+                })
 
             return_obj['model_list'] = model_list
             return_obj['success'] = True
