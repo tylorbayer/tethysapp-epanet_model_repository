@@ -8,7 +8,7 @@ class EpanetModelRepository(TethysAppBase):
 
     name = 'EPANET Model Repository'
     index = 'epanet_model_repository:home'
-    icon = 'epanet_model_repository/images/CIMM.png'
+    icon = 'epanet_model_repository/images/NCIMM.png'
     package = 'epanet_model_repository'
     root_url = 'epanet-model-repository'
     color = '#006699'
