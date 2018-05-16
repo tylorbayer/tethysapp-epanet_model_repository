@@ -22,7 +22,7 @@
         availabilityFilters,
         showLog;
 
-    //  *********FUNCTIONS***********
+    //  **********FUNCTIONS***********
     let addListenersToModelRepTable,
         addListenersToFilters,
         refreshFilters,
