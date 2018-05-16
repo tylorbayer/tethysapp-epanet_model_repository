@@ -16,14 +16,14 @@
     /************************************************************************
      *                      MODULE LEVEL / GLOBAL VARIABLES
      *************************************************************************/
-    var dataTableLoadModels,
+    let dataTableLoadModels,
         ownerFilters,
         subjectFilters,
         availabilityFilters,
         showLog;
 
     //  *********FUNCTIONS***********
-    var addListenersToModelRepTable,
+    let addListenersToModelRepTable,
         addListenersToFilters,
         refreshFilters,
         addInitialEventListeners,
@@ -41,7 +41,7 @@
         addLogEntry;
 
     //  **********Query Selectors************
-    var $modelRep,
+    let $modelRep,
         $ownerFilters,
         $subjectFilters,
         $availabilityFilters,
@@ -63,14 +63,14 @@
         });
 
         $btnUl.click(function() {
-            if ($loadFromLocal.val() != '' && $inpUlTitle.val() != '' && $inpUlDescription.val() != '' && $inpUlKeywords.val() != '') {
-                var data = new FormData();
+            if ($loadFromLocal.val() !== '' && $inpUlTitle.val() !== '' && $inpUlDescription.val() !== '' && $inpUlKeywords.val() !== '') {
+                let data = new FormData();
                 data.append('model_title', $inpUlTitle.val());
                 data.append('model_description', $inpUlDescription.val());
                 data.append('model_keywords', $inpUlKeywords.tagsinput('items'));
 
-                var file = $loadFromLocal[0].files[0];
-                var reader = new FileReader();
+                let file = $loadFromLocal[0].files[0];
+                let reader = new FileReader();
                 reader.onload = function() {
                     data.append('model_file', reader.result);
                     uploadModel(data);
@@ -151,23 +151,23 @@
     };
 
     onClickOpenModel = function () {
-        var $rdoRes = $('.rdo-model:checked');
-        var modelId = $rdoRes.val();
-        var curURL = window.location.href;
-        window.open(curURL.substring(0, curURL.indexOf('/apps/') + 6) + "epanet-model-viewer/?modelID=" + modelId,"_self");
+        let $rdoRes = $('.rdo-model:checked');
+        let modelId = $rdoRes.val();
+        let curURL = window.location.href;
+        window.open(curURL.substring(0, curURL.indexOf('/apps/') + 6) + "epanet-model-viewer/?modelID=" + modelId, "_blank");
     };
 
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-        var ownAdd = false;
-        var subAdd  = false;
-        var avaAdd  = false;
+        let ownAdd = false;
+        let subAdd  = false;
+        let avaAdd  = false;
 
-        var owner = data[4];
-        var subjects = data[2].split(', ');
-        var availability = data[3];
+        let owner = data[4];
+        let subjects = data[2].split(', ');
+        let availability = data[3];
 
-        if (typeof ownerFilters == 'undefined' || typeof subjectFilters == 'undefined' || typeof subjectFilters == 'undefined' ||
-            (subjectFilters.length == 0 && ownerFilters.length == 0 && availabilityFilters.length == 0))
+        if (typeof ownerFilters === 'undefined' || typeof subjectFilters === 'undefined' || typeof subjectFilters === 'undefined' ||
+            (subjectFilters.length === 0 && ownerFilters.length === 0 && availabilityFilters.length === 0))
             return true;
         else {
             if (ownerFilters.length > 0)
@@ -176,7 +176,7 @@
                 ownAdd = true;
 
             if (subjectFilters.length > 0) {
-                for (var i in subjects) {
+                for (let i in subjects) {
                     if (subjectFilters.indexOf(subjects[i]) > -1) {
                         subAdd = true;
                     }
@@ -186,7 +186,7 @@
                 subAdd = true;
 
             if (availabilityFilters.length > 0) {
-                for (var i in availabilityFilters) {
+                for (let i in availabilityFilters) {
                     if (availability.indexOf(availabilityFilters[i]) > -1) {
                         avaAdd = true;
                     }
@@ -249,9 +249,9 @@
     };
 
     buildModelRepTable = function (modelList) {
-        var owners = {};
-        var subjects = {};
-        var availability = {
+        let owners = {};
+        let subjects = {};
+        let availability = {
             public: 0,
             discoverable: 0,
             private: 0,
@@ -259,7 +259,7 @@
             nonShareable: 0
         };
 
-        var modelTableHtml;
+        let modelTableHtml;
 
         modelList = typeof modelList === 'string' ? JSON.parse(modelList) : modelList;
         modelTableHtml = '<table id="tbl-models"><thead><th></th><th>Title</th><th>Subjects</th><th> Info</th><th>Owner</th></thead><tbody>';
@@ -282,14 +282,14 @@
                 '<td class="model_title">' + model.title + '</td>' +
                 '<td class="model_subjects">' + model.subjects.join(', ') + '</td>';
 
-            var modelInfoHtml = "";
+            let modelInfoHtml = "";
 
-            if (model.public == true) {
+            if (model.public === true) {
                 modelInfoHtml += 'p<img src="/static/epanet_model_repository/images/public.png" data-toggle="tooltip" data-placement="right" title="Public">';
                 availability["public"] += 1;
             }
             else
-                if (model.discoverable == true) {
+                if (model.discoverable === true) {
                     modelInfoHtml += 'd<img src="/static/epanet_model_repository/images/discoverable.png" data-toggle="tooltip" data-placement="right" title="Discoverable">';
                     availability["discoverable"] += 1;
                 }
@@ -297,7 +297,7 @@
                     modelInfoHtml += 'r<img src="/static/epanet_model_repository/images/private.png" data-toggle="tooltip" data-placement="right" title="Private">';
                     availability["private"] += 1;
                 }
-            if (model.shareable == true) {
+            if (model.shareable === true) {
                 modelInfoHtml += 's<img src="/static/epanet_model_repository/images/shareable.png" data-toggle="tooltip" data-placement="right" title="Shareable">';
                 availability["shareable"] += 1;
             }
@@ -345,12 +345,12 @@
     };
 
     populateFilter = function (filterContainer, filterType, filterList) {
-        var filterHTML;
-        var identifier;
+        let filterHTML;
+        let identifier;
 
         filterContainer.empty();
 
-        for (var filter in filterList) {
+        for (let filter in filterList) {
             identifier = filterType + "-" + filter;
 
             filterHTML = '<li class="list-group-item" rel="' + filterType + ',' + filter + '"><span class="badge">' + filterList[filter] +
@@ -377,12 +377,12 @@
             contentType: false,
             data: data,
             error: function () {
-                var message = 'An unexpected error occurred while uploading the model ';
+                let message = 'An unexpected error occurred while uploading the model ';
 
                 addLogEntry('danger', message);
             },
             success: function (response) {
-                var message;
+                let message;
 
                 if (response.hasOwnProperty('success')) {
                     if (response.hasOwnProperty('message')) {
@@ -415,8 +415,8 @@
     };
 
     addLogEntry = function (type, message, show) {
-        var icon;
-        var timeStamp;
+        let icon;
+        let timeStamp;
 
         switch (type) {
             case 'success':
@@ -481,10 +481,10 @@
     };
 
     getCookie = function (name) {
-        var cookie;
-        var cookies;
-        var cookieValue = null;
-        var i;
+        let cookie;
+        let cookies;
+        let cookieValue = null;
+        let i;
 
         if (document.cookie && document.cookie !== '') {
             cookies = document.cookie.split(';');
