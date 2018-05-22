@@ -22,7 +22,7 @@
         availabilityFilters,
         showLog;
 
-    //  *********FUNCTIONS***********
+    //  **********FUNCTIONS***********
     let addListenersToModelRepTable,
         addListenersToFilters,
         refreshFilters,
@@ -95,7 +95,8 @@
             $btnOpenModel.prop('disabled', false);
 
             $(this)
-                .dblclick(function () {
+                .dblclick(function (evt) {
+                    evt.stopImmediatePropagation();
                     onClickOpenModel();
                 })
                 .css({
@@ -289,14 +290,14 @@
                 availability["public"] += 1;
             }
             else
-                if (model.discoverable === true) {
-                    modelInfoHtml += 'd<img src="/static/epanet_model_repository/images/discoverable.png" data-toggle="tooltip" data-placement="right" title="Discoverable">';
-                    availability["discoverable"] += 1;
-                }
-                else {
-                    modelInfoHtml += 'r<img src="/static/epanet_model_repository/images/private.png" data-toggle="tooltip" data-placement="right" title="Private">';
-                    availability["private"] += 1;
-                }
+            if (model.discoverable === true) {
+                modelInfoHtml += 'd<img src="/static/epanet_model_repository/images/discoverable.png" data-toggle="tooltip" data-placement="right" title="Discoverable">';
+                availability["discoverable"] += 1;
+            }
+            else {
+                modelInfoHtml += 'r<img src="/static/epanet_model_repository/images/private.png" data-toggle="tooltip" data-placement="right" title="Private">';
+                availability["private"] += 1;
+            }
             if (model.shareable === true) {
                 modelInfoHtml += 's<img src="/static/epanet_model_repository/images/shareable.png" data-toggle="tooltip" data-placement="right" title="Shareable">';
                 availability["shareable"] += 1;
@@ -365,7 +366,7 @@
         $filterGroup.find('.list-group-item').sort(function(a, b) {
             return $(b).find('.badge').html() - $(a).find('.badge').html();
         })
-        .appendTo($filterGroup);
+            .appendTo($filterGroup);
     };
 
     uploadModel = function (data) {
@@ -400,7 +401,7 @@
                             addLogEntry('warning', message);
                         }
                         $modelRep.html('<img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
-                                '<br><p><b>Loading model repository...</b></p><p>Note: Loading will continue if dialog is closed.</p>');
+                            '<br><p><b>Loading model repository...</b></p><p>Note: Loading will continue if dialog is closed.</p>');
                         alert("Model has successfully been uploaded to HydroShare.");
                         generateModelList();
                     }
@@ -506,6 +507,8 @@
      **************ONLOAD FUNCTION*******************
      ----------------------------------------------*/
     $(function () {
+        $("#app-content-wrapper").removeClass('show-nav');
+
         initializeJqueryVariables();
         addInitialEventListeners();
         addDefaultBehaviorToAjax();
