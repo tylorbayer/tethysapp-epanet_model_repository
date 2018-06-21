@@ -95,7 +95,18 @@
       <p>Note: Loading will continue if dialog is closed.</p>
     </div>
     <button id="btn-upload-modal" class="btn btn-default model-btn" data-toggle="modal" data-target="#modal-upload">Upload Model to Repository</button>
-    <button id="btn-open-model" class="btn btn-primary btn-upload hidden" disabled>Open Model</button>
+    <div class="btn-group dropup">
+      <button id="btn-open-model" class="btn btn-primary btn-upload dropdown-toggle hidden" type="button" id="btn-open-model" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+        Open Model  <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="btn-open-model">
+        <li><a id="btn-open-model-viewer" class="dropdown-item">EPANET Model Viewer</a></li>
+        <li><a id="btn-open-city-water" class="dropdown-item">Aquaveo City Water</a></li>
+        <li><a id="btn-open-other" class="dropdown-item">Other</a></li>
+      </ul>
+    </div>
+    <button id="btn-metadata" class="btn btn-primary btn-upload hidden" disabled>View Metadata</button>
+    <button id="btn-download" class="btn btn-primary btn-upload hidden" disabled>Download</button>
   </div>
 </div>
 {% endblock %}

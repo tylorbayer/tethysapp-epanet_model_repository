@@ -51,15 +51,67 @@
         $inpUlTitle,
         $inpUlDescription,
         $inpUlKeywords,
-        $btnOpenModel;
+        $btnOpenModel,
+        $btnOpenModelViewer,
+        $btnDownload,
+        $btnMetadata;
 
     /******************************************************
      **************FUNCTION DECLARATIONS*******************
      ******************************************************/
 
     addInitialEventListeners = function () {
-        $btnOpenModel.click(function () {
+        $btnOpenModelViewer.click(function () {
             onClickOpenModel();
+        });
+
+        $btnDownload.click(function () {
+            let modelId = $('.rdo-model:checked').val();
+            let data = {'model_id': modelId};
+
+            $.ajax({
+                type: 'GET',
+                url: '/apps/epanet-model-repository/download-epanet-model',
+                dataType: 'json',
+                data: data,
+                error: function () {
+                    let message = 'An unexpected error ocurred while processing the following model ' +
+                        '<a href="https://www.hydroshare.org/resource/' + modelId + '" target="_blank">' +
+                        modelId + '</a>. An app admin has been notified.';
+
+                    addLogEntry('danger', message);
+                },
+                success: function (response) {
+                    let message;
+
+                    if (response.hasOwnProperty('success')) {
+                        if (response.hasOwnProperty('message')) {
+                            message = response.message;
+                        }
+
+                        if (!response.success) {
+                            if (!message) {
+                                message = 'An unexpected error ocurred while processing the following model ' +
+                                    '<a href="https://www.hydroshare.org/resource/' + modelId + '" target="_blank">' +
+                                    modelId + '</a>. An app admin has been notified.';
+                            }
+
+                            addLogEntry('danger', message);
+                        } else {
+                            if (message) {
+                                addLogEntry('warning', message);
+                            }
+                            if (response.hasOwnProperty('results')) {
+                                alert("Model file successfully downloaded to Downloads folder");
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        $btnMetadata.click(function () {
+            // md click here
         });
 
         $btnUl.click(function() {
@@ -93,6 +145,8 @@
     addListenersToModelRepTable = function () {
         $modelRep.find('tbody tr').on('click', function () {
             $btnOpenModel.prop('disabled', false);
+            // $btnMetadata.prop('disabled', false);
+            $btnDownload.prop('disabled', false);
 
             $(this)
                 .dblclick(function (evt) {
@@ -152,8 +206,7 @@
     };
 
     onClickOpenModel = function () {
-        let $rdoRes = $('.rdo-model:checked');
-        let modelId = $rdoRes.val();
+        let modelId = $('.rdo-model:checked').val();
         let curURL = window.location.href;
         window.open(curURL.substring(0, curURL.indexOf('/apps/') + 6) + "epanet-model-viewer/?modelID=" + modelId, "_blank");
     };
@@ -242,7 +295,9 @@
                         if (response.hasOwnProperty('model_list')) {
                             buildModelRepTable(response.model_list);
                         }
-                        $btnOpenModel.add('#div-chkbx-model-auto-close').removeClass('hidden');
+                        $btnDownload.removeClass('hidden');
+                        $btnMetadata.removeClass('hidden');
+                        $btnOpenModel.removeClass('hidden');
                     }
                 }
             }
@@ -457,7 +512,10 @@
         $inpUlTitle = $('#inp-upload-title');
         $inpUlDescription = $('#inp-upload-description');
         $inpUlKeywords = $('#tagsinp-upload-keywords');
-        $btnOpenModel = $('#btn-open-model')
+        $btnOpenModel = $('#btn-open-model');
+        $btnOpenModelViewer = $('#btn-open-model-viewer');
+        $btnDownload = $('#btn-download');
+        $btnMetadata = $('#btn-metadata');
     };
 
     /*-----------------------------------------------
@@ -508,6 +566,7 @@
      ----------------------------------------------*/
     $(function () {
         $("#app-content-wrapper").removeClass('show-nav');
+        $('.dropdown-toggle').dropdown();
 
         initializeJqueryVariables();
         addInitialEventListeners();
