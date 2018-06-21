@@ -178,6 +178,11 @@ h1, h2, h3, h4, h5, h6 {
 #load-from-local {
     display: inline;
 }
+#btn-metadata, #btn-download {
+    float: right;
+    display: inline;
+    margin-right: 10px;
+}
 #btn-open-model {
     float: right;
     display: inline;
@@ -187,4 +192,8 @@ h1, h2, h3, h4, h5, h6 {
     float: left;
     display: inline;
     margin-left: 40px;
+}
+.btn-group {
+    float: right;
+    cursor:pointer;
 }

@@ -10,9 +10,6 @@ message_template_param_unfilled = 'The required "{param}" parameter was not fulf
 
 
 def get_epanet_model_list(request):
-    """
-    This is an example controller that uses the HydroShare API.
-    """
     return_obj = {
         'success': False,
         'message': None,
@@ -28,30 +25,6 @@ def get_epanet_model_list(request):
         model_list = []
 
         try:
-            # for model in hs.resources(type="ModelInstanceResource"):
-            #     add_model = False
-            #
-            #     science_metadata_json = hs.getScienceMetadata(model['resource_id'])
-            #
-            #     if not science_metadata_json['subjects'] is None:
-            #         subjects = []
-            #         for subject in science_metadata_json['subjects']:
-            #             if subject['value'] == 'EPANET_2.0':
-            #                 add_model = True
-            #                 continue
-            #
-            #             subjects.append(subject['value'])
-            #
-            #         if add_model:
-            #             model_list.append({
-            #                 'title': model['resource_title'],
-            #                 'id': model['resource_id'],
-            #                 'owner': model['creator'],
-            #                 'public': model['public'],
-            #                 'shareable': model['shareable'],
-            #                 'discoverable': model['discoverable'],
-            #                 'subjects': subjects
-            #             })
             for model in hs.resources(full_text_search="{%EPANET Model Repository%}"):
                 science_metadata_json = hs.getScienceMetadata(model['resource_id'])
 
@@ -84,6 +57,30 @@ def get_epanet_model_list(request):
 
     return JsonResponse(return_obj)
 
+# for model in hs.resources(type="ModelInstanceResource"):
+#     add_model = False
+#
+#     science_metadata_json = hs.getScienceMetadata(model['resource_id'])
+#
+#     if not science_metadata_json['subjects'] is None:
+#         subjects = []
+#         for subject in science_metadata_json['subjects']:
+#             if subject['value'] == 'EPANET_2.0':
+#                 add_model = True
+#                 continue
+#
+#             subjects.append(subject['value'])
+#
+#         if add_model:
+#             model_list.append({
+#                 'title': model['resource_title'],
+#                 'id': model['resource_id'],
+#                 'owner': model['creator'],
+#                 'public': model['public'],
+#                 'shareable': model['shareable'],
+#                 'discoverable': model['discoverable'],
+#                 'subjects': subjects
+#             })
 
 def upload_epanet_model(request):
     return_obj = {
@@ -125,6 +122,40 @@ def upload_epanet_model(request):
 
         return_obj['results'] = resource_id
         return_obj['success'] = True
+
+    else:
+        return_obj['message'] = message_template_wrong_req_method.format(method="GET")
+
+    return JsonResponse(return_obj)
+
+
+def download_epanet_model(request):
+    return_obj = {
+        'success': False,
+        'message': None,
+        'results': "",
+    }
+
+    if request.is_ajax() and request.method == 'GET':
+        if not request.GET.get('model_id'):
+            return_obj['message'] = message_template_param_unfilled.format(param='model_id')
+        else:
+            model_id = request.GET['model_id']
+            download_path = os.path.expanduser("~/Downloads")
+
+            try:
+                hs = get_oauth_hs(request)
+            except:
+                hs = HydroShare()
+
+            for model_file in hs.getResourceFileList(model_id):
+                model_url = model_file['url']
+                model_name = model_url[model_url.find('contents/') + 9:]
+
+                hs.getResourceFile(model_id, model_name, destination=download_path)
+
+            return_obj['results'] = "success"
+            return_obj['success'] = True
 
     else:
         return_obj['message'] = message_template_wrong_req_method.format(method="GET")
