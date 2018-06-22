@@ -161,3 +161,31 @@ def download_epanet_model(request):
         return_obj['message'] = message_template_wrong_req_method.format(method="GET")
 
     return JsonResponse(return_obj)
+
+
+def get_epanet_model_metadata(request):
+    return_obj = {
+        'success': False,
+        'message': None,
+        'results': "",
+    }
+
+    if request.is_ajax() and request.method == 'GET':
+        if not request.GET.get('model_id'):
+            return_obj['message'] = message_template_param_unfilled.format(param='model_id')
+        else:
+            model_id = request.GET['model_id']
+
+            try:
+                hs = get_oauth_hs(request)
+            except:
+                hs = HydroShare()
+
+            metadata_json = hs.getScienceMetadata(model_id)
+            return_obj['results'] = metadata_json
+            return_obj['success'] = True
+
+    else:
+        return_obj['message'] = message_template_wrong_req_method.format(method="GET")
+
+    return JsonResponse(return_obj)
