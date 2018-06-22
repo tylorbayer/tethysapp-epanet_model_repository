@@ -197,3 +197,7 @@ h1, h2, h3, h4, h5, h6 {
     float: right;
     cursor:pointer;
 }
+
+#modal-metadata .modal-dialog {
+    width: 900px !important;
+}

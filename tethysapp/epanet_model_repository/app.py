@@ -35,7 +35,10 @@ class EpanetModelRepository(TethysAppBase):
                     controller='epanet_model_repository.ajax_controllers.upload_epanet_model'),
             url_map(name='download_epanet_model',
                     url='epanet-model-repository/download-epanet-model',
-                    controller='epanet_model_repository.ajax_controllers.download_epanet_model')
+                    controller='epanet_model_repository.ajax_controllers.download_epanet_model'),
+            url_map(name='get_epanet_model-metadata',
+                    url='epanet-model-repository/get-epanet-model-metadata',
+                    controller='epanet_model_repository.ajax_controllers.get_epanet_model_metadata')
         )
 
         return url_maps

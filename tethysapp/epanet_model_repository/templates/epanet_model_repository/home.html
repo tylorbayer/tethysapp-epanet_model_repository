@@ -105,7 +105,7 @@
         <li><a id="btn-open-other" class="dropdown-item">Other</a></li>
       </ul>
     </div>
-    <button id="btn-metadata" class="btn btn-primary btn-upload hidden" disabled>View Metadata</button>
+    <button id="btn-metadata" class="btn btn-primary model-btn btn-upload hidden" data-toggle="modal" data-target="#modal-metadata" disabled>View Metadata</button>
     <button id="btn-download" class="btn btn-primary btn-upload hidden" disabled>Download</button>
   </div>
 </div>
@@ -132,6 +132,23 @@
       <div class="modal-footer">
         <button id="btn-upload-cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button id="btn-upload" type="button" class="btn btn-primary">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Metadata Modal -->
+<div id="modal-metadata" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title">Model Metadata</h3>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

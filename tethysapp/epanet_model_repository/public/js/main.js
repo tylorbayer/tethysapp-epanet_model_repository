@@ -35,6 +35,7 @@
         uploadModel,
         resetUploadState,
         initializeJqueryVariables,
+        addMetadataToModal,
         addDefaultBehaviorToAjax,
         checkCsrfSafe,
         getCookie,
@@ -54,7 +55,8 @@
         $btnOpenModel,
         $btnOpenModelViewer,
         $btnDownload,
-        $btnMetadata;
+        $btnMetadata,
+        $modalMetadata;
 
     /******************************************************
      **************FUNCTION DECLARATIONS*******************
@@ -111,7 +113,51 @@
         });
 
         $btnMetadata.click(function () {
-            // md click here
+            $modalMetadata.find('.modal-body').html('<img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
+                            '<br><p><b>Loading model metadata...</b></p><p>Note: Don\'t close window.</p>');
+            
+            let modelId = $('.rdo-model:checked').val();
+            let data = {'model_id': modelId};
+
+            $.ajax({
+                type: 'GET',
+                url: '/apps/epanet-model-repository/get-epanet-model-metadata',
+                dataType: 'json',
+                data: data,
+                error: function () {
+                    let message = 'An unexpected error ocurred while processing the following model ' +
+                        '<a href="https://www.hydroshare.org/resource/' + modelId + '" target="_blank">' +
+                        modelId + '</a>. An app admin has been notified.';
+
+                    addLogEntry('danger', message);
+                },
+                success: function (response) {
+                    let message;
+
+                    if (response.hasOwnProperty('success')) {
+                        if (response.hasOwnProperty('message')) {
+                            message = response.message;
+                        }
+
+                        if (!response.success) {
+                            if (!message) {
+                                message = 'An unexpected error ocurred while processing the following model ' +
+                                    '<a href="https://www.hydroshare.org/resource/' + modelId + '" target="_blank">' +
+                                    modelId + '</a>. An app admin has been notified.';
+                            }
+
+                            addLogEntry('danger', message);
+                        } else {
+                            if (message) {
+                                addLogEntry('warning', message);
+                            }
+                            if (response.hasOwnProperty('results')) {
+                                addMetadataToModal(response.results);
+                            }
+                        }
+                    }
+                }
+            });
         });
 
         $btnUl.click(function() {
@@ -142,10 +188,41 @@
         });
     };
 
+    addMetadataToModal = function (metadata) {
+        let metadataHTML = '<p><h1>' + metadata['title'] + '</h1><h6>' + metadata['description'] + '</h6>' +
+            '<a href="' + metadata['identifiers'][0]['url'] + '" style="color:#3366ff">View the Model in HydroShare</a><br><br>' +
+            'Created: ' + metadata['dates'][1]['start_date'].substring(0, 10) +
+            ', &emsp;Last Modified: ' + metadata['dates'][1]['start_date'].substring(0, 10) +
+            '<br>Author: ' + metadata['creators'][0]['name'] + '<br>Rights: ' + metadata['rights'];
+
+        let subjects = "";
+        let i;
+        for (i in metadata['subjects']) {
+            subjects += metadata['subjects'][i]['value'] + ', ';
+        }
+        metadataHTML += '<br>Subjects: ' + subjects.substring(0, subjects.length - 2);
+
+
+        try {
+            metadataHTML += '<br> Program: ' + '<a href="' + metadata['executed_by']['modelProgramIdentifier'] +
+                '" style="color:#3366ff">' + metadata['executed_by']['modelProgramName'] + '</a>';
+        }
+        catch (error) {
+            //    No program included in metadata
+        }
+
+
+        metadataHTML += '</p><br>';
+
+        metadataHTML += '<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><a data-toggle="collapse" href="#metadata-json">&nbsp; Raw Metadata JSON<span class="glyphicon glyphicon-minus pull-left"></span></a></h4></div><div id="metadata-json" class="filter-list panel-collapse collapse"><pre>' + JSON.stringify(metadata, null, 2) + '</pre></div></div>';
+
+        $modalMetadata.find('.modal-body').html(metadataHTML);
+    };
+
     addListenersToModelRepTable = function () {
         $modelRep.find('tbody tr').on('click', function () {
             $btnOpenModel.prop('disabled', false);
-            // $btnMetadata.prop('disabled', false);
+            $btnMetadata.prop('disabled', false);
             $btnDownload.prop('disabled', false);
 
             $(this)
@@ -516,6 +593,7 @@
         $btnOpenModelViewer = $('#btn-open-model-viewer');
         $btnDownload = $('#btn-download');
         $btnMetadata = $('#btn-metadata');
+        $modalMetadata = $('#modal-metadata');
     };
 
     /*-----------------------------------------------
