@@ -201,3 +201,27 @@ h1, h2, h3, h4, h5, h6 {
 #modal-metadata .modal-dialog {
     width: 900px !important;
 }
+#byu-logo-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 10px;
+    overflow-y: visible;
+    height: 60px;
+    width: 150px;
+}
+#byu-logo-container img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+}
+#byu-logo-container span {
+    position: absolute;
+    bottom: 0;
+    left: 55px;
+    width: 150px;
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 12px;
+}
