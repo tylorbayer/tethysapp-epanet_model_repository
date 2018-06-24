@@ -160,16 +160,38 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h5 class="modal-title" id="help-modal-label">Example Modal</h5>
+        <h4 class="modal-title" id="help-modal-label">Help</h4>
       </div>
       <div class="modal-body">
-        <p>You can add custom buttons to the app header using the <code>header_buttons</code> block. Use anchor/link tags for the button and wrap it in a div with the class <code>header-button</code>. For buttons with the gliphyicons, add the <code>glyphicon-button</code> class as well.</p>
-        <p>Ever have trouble using a modal in a Tethys app? Use the <code>after_app_content</code> block for modal content to allow them to function properly. See: <a href="https://getbootstrap.com/javascript/#modals">Bootstrap Modals</a></p>
-        <p>Add tooltips to any element by adding the <code>data-toggle</code>, <code>data-placement</code>, and <code>title</code> attributes to the button. See: <a href="https://getbootstrap.com/javascript/#tooltips">Bootstrap Tooltips</a></p>
+        <p><b>Welcome to the EPANET Model Repository App</b></p>
+        <h5>You can do the following:</h5>
+        <ol>
+          <li class="welcome-step">Search for EPANET Models
+            <p><b>Click on filters or search using the search bar</b></p>
+          </li>
+          <li class="welcome-step">Download a Model File
+            <p><b>Select a model and click "Download"</b></p>
+            <p><b>The file will be in your "Downloads" folder when download is complete</b></p>
+          </li>
+          <li class="welcome-step">View a Model File's Metadata
+            <p><b>Select a model and click "View Metadata"</b></p>
+          </li>
+          <li class="welcome-step">Open a Model File
+            <p><b>Select a model and click "Open Model". You can then open the model in the EPANET Model Viewer App or in a third-party app</b></p>
+          </li>
+          <li class="welcome-step">Save a Model File to Hydroshare
+            <p><b>Click "Upload Model to Hydroshare", enter in the required information and click "Upload"</b></p>
+          </li>
+          <li class="welcome-step">Click the 'X' in the top-right of the app to return to the NCIMM Apps Library</li>
+        </ol>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+        <div id="byu-logo-container">
+          <span><i>Developed at the BYU Hydroinformatics Lab</i></span>
+          <img src='/static/epanet_model_repository/images/byu-medallion.png'/>
+        </div>
+        <a href="https://github.com/tylorbayer/tethysapp-epanet_model_repository" target="_blank" class="btn btn-default">View Code</a>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
