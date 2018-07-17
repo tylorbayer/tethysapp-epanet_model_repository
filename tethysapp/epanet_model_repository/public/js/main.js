@@ -68,6 +68,8 @@
         });
 
         $btnDownload.click(function () {
+            $('#grp-btn').append('<div id="img-dl"><img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
+                            '<br><p><b>Downloading model...</b></p><p>Note: Don\'t close app.</p></div>');
             let modelId = $('.rdo-model:checked').val();
             let data = {'model_id': modelId};
 
@@ -104,6 +106,7 @@
                                 addLogEntry('warning', message);
                             }
                             if (response.hasOwnProperty('results')) {
+                                $('#img-dl').remove();
                                 alert("Model file successfully downloaded to Downloads folder");
                             }
                         }

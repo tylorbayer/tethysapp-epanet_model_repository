@@ -57,30 +57,6 @@ def get_epanet_model_list(request):
 
     return JsonResponse(return_obj)
 
-# for model in hs.resources(type="ModelInstanceResource"):
-#     add_model = False
-#
-#     science_metadata_json = hs.getScienceMetadata(model['resource_id'])
-#
-#     if not science_metadata_json['subjects'] is None:
-#         subjects = []
-#         for subject in science_metadata_json['subjects']:
-#             if subject['value'] == 'EPANET_2.0':
-#                 add_model = True
-#                 continue
-#
-#             subjects.append(subject['value'])
-#
-#         if add_model:
-#             model_list.append({
-#                 'title': model['resource_title'],
-#                 'id': model['resource_id'],
-#                 'owner': model['creator'],
-#                 'public': model['public'],
-#                 'shareable': model['shareable'],
-#                 'discoverable': model['discoverable'],
-#                 'subjects': subjects
-#             })
 
 def upload_epanet_model(request):
     return_obj = {
