@@ -74,7 +74,7 @@ def upload_epanet_model(request):
         model_title = request.POST['model_title']
         resource_filename = model_title + ".inp"
 
-        abstract = request.POST['model_description']
+        abstract = request.POST['model_description'] + '\n{%EPANET Model Repository%}'
         title = model_title
 
         user_keywords = ["EPANET_2.0"]
