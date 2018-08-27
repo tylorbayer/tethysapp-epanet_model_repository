@@ -68,8 +68,8 @@
         });
 
         $btnDownload.click(function () {
-            $('#grp-btn').append('<div id="img-dl"><img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
-                            '<br><p><b>Downloading model...</b></p><p>Note: Don\'t close app.</p></div>');
+            $('#load-anim').html('<div id="img-dl"><img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
+                '<br><p><b>Downloading model...</b></p><p>Note: Don\'t close app.</p></div>');
             let modelId = $('.rdo-model:checked').val();
             let data = {'model_id': modelId};
 
@@ -84,6 +84,7 @@
                         modelId + '</a>. An app admin has been notified.';
 
                     addLogEntry('danger', message);
+                    $('#img-dl').remove();
                 },
                 success: function (response) {
                     let message;
@@ -106,19 +107,43 @@
                                 addLogEntry('warning', message);
                             }
                             if (response.hasOwnProperty('results')) {
-                                $('#img-dl').remove();
+                                let modelFile = response.results;
+
+                                let blob = new Blob([modelFile], {type: 'text/plain;charset=utf-8;'});
+
+                                let filename = response.name;
+
+                                if (navigator.msSaveBlob) { // IE 10+
+                                    navigator.msSaveBlob(blob, filename);
+                                }
+                                else {
+                                    let link = document.createElement("a");
+                                    if (link.download !== undefined) { // feature detection
+                                        // Browsers that support HTML5 download attribute
+                                        let url = URL.createObjectURL(blob);
+                                        link.setAttribute("href", url);
+                                        link.setAttribute("download", filename);
+                                        link.style.visibility = 'hidden';
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    } else { // If the internet browser is not compatible with this feature
+                                        $("#merge_form").submit();
+                                    }
+                                }
                                 alert("Model file successfully downloaded to Downloads folder");
                             }
                         }
                     }
+                    $('#img-dl').remove();
                 }
             });
         });
 
         $btnMetadata.click(function () {
             $modalMetadata.find('.modal-body').html('<img src="/static/epanet_model_viewer/images/loading-animation.gif">' +
-                            '<br><p><b>Loading model metadata...</b></p><p>Note: Don\'t close window.</p>');
-            
+                '<br><p><b>Loading model metadata...</b></p><p>Note: Don\'t close window.</p>');
+
             let modelId = $('.rdo-model:checked').val();
             let data = {'model_id': modelId};
 

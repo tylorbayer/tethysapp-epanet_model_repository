@@ -110,6 +110,7 @@ def download_epanet_model(request):
         'success': False,
         'message': None,
         'results': "",
+        'name': ""
     }
 
     if request.is_ajax() and request.method == 'GET':
@@ -117,7 +118,6 @@ def download_epanet_model(request):
             return_obj['message'] = message_template_param_unfilled.format(param='model_id')
         else:
             model_id = request.GET['model_id']
-            download_path = os.path.expanduser("~/Downloads")
 
             try:
                 hs = get_oauth_hs(request)
@@ -128,13 +128,16 @@ def download_epanet_model(request):
                 model_url = model_file['url']
                 model_name = model_url[model_url.find('contents/') + 9:]
 
-                hs.getResourceFile(model_id, model_name, destination=download_path)
+                model = ""
+                for line in hs.getResourceFile(model_id, model_name):
+                    model += line
 
-            return_obj['results'] = "success"
-            return_obj['success'] = True
+                return_obj['name'] = model_name
+                return_obj['results'] = model
+                return_obj['success'] = True
 
     else:
-        return_obj['message'] = message_template_wrong_req_method.format(method="GET")
+        return_obj['message'] = message_template_wrong_req_method.format(method="POST")
 
     return JsonResponse(return_obj)
 
