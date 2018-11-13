@@ -25,7 +25,7 @@ def get_epanet_model_list(request):
         model_list = []
 
         try:
-            for model in hs.resources(full_text_search="{%EPANET Model Repository%}"):
+            for model in hs.resources(resourceType="ModelInstanceResource", subject="epanet"):
                 science_metadata_json = hs.getScienceMetadata(model['resource_id'])
 
                 subjects = []
