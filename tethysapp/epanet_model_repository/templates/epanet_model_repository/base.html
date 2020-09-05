@@ -12,23 +12,18 @@
 {# The name you provided in your app.py is accessible through the tethys_app.name context variable #}
 {% block app_title %}{{ tethys_app.name }}{% endblock %}
 
-{% block app_navigation_items %}
-<li class="title">Site Navigation</li>
-<li><a href="http://www.ncimm.org/">NCIMM</a></li>
-{% endblock %}
+{% block app_navigation_items %}{% endblock %}
 
-{% block app_content %}
-{% endblock %}
+{% block app_content %}{% endblock %}
 
-{% block app_actions %}
-{% endblock %}
+{% block app_actions %}{% endblock %}
 
 {% block content_dependent_styles %}
 {{ block.super }}
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
 <link rel="stylesheet" href="http://bootstrap-tagsinput.github.io/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
-<link href="{% static 'epanet_model_repository/css/main.css' %}" rel="stylesheet"/>
+<link href="{% static 'epanet_model_repository/css/main.css' %}" rel="stylesheet" />
 {% endblock %}
 
 {% block scripts %}

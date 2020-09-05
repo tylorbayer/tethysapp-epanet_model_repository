@@ -1,6 +1,8 @@
 {% extends "epanet_model_repository/base.html" %}
 {% load tethys_gizmos %}
 
+{% block app_navigation_override %}{% endblock %}
+
 {% block header_buttons %}
 <div class="header-button glyphicon-button" data-toggle="tooltip" data-placement="bottom" title="Help">
   <a data-toggle="modal" data-target="#help-modal"><span class="glyphicon glyphicon-question-sign"></span></a>

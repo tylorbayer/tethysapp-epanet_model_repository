@@ -12,7 +12,7 @@ class EpanetModelRepository(TethysAppBase):
     package = 'epanet_model_repository'
     root_url = 'epanet-model-repository'
     color = '#006699'
-    description = 'Place a brief description of your app here.'
+    description = ''
     tags = 'EPANET'
     enable_feedback = False
     feedback_emails = []
