@@ -20,7 +20,8 @@ def get_epanet_model_list(request):
         try:
             hs = get_oauth_hs(request)
         except:
-            hs = HydroShare()
+            return_obj['message'] = 'You must be logged in through HydroShare to view resources.'
+            return JsonResponse(return_obj)
 
         model_list = []
 
