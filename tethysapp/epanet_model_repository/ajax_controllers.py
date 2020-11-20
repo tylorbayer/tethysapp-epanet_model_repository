@@ -131,7 +131,7 @@ def download_epanet_model(request):
 
                 model = ""
                 for line in hs.getResourceFile(model_id, model_name):
-                    model += line
+                    model += line.decode("utf-8")
 
                 return_obj['name'] = model_name
                 return_obj['results'] = model
